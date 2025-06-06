@@ -19,7 +19,7 @@ def main():
         experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
 
     # 3. Load Data
-    df = pd.read_csv('MLProject/diabetes_processed.csv')
+    df = pd.read_csv('diabetes_processed.csv')
 
     # 3. Train model dengan default parameters
     with mlflow.start_run(experiment_id=experiment_id):
@@ -34,7 +34,7 @@ def main():
         y_test = test_df['Outcome']
 
         mlflow.log_param("model_type", "RandomForest")
-        
+
         # Initialize and train model
         rf = RandomForestClassifier(random_state=42, class_weight='balanced')
         rf.fit(X_train, y_train)
