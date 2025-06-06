@@ -1,40 +1,39 @@
-import os
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                           f1_score, roc_auc_score, confusion_matrix)
 import mlflow
 import mlflow.sklearn
+from mlflow.models.signature import infer_signature
+from pathlib import Path
+import os
 
 def main():
-    # 1. Setup MLflow Tracking
-    mlflow_dir = os.path.join(os.getcwd(), "mlruns")
-    os.makedirs(mlflow_dir, exist_ok=True)
-    mlflow.set_tracking_uri(f"file://{mlflow_dir}")
+    # Bersihkan run yg aktif
+    if mlflow.active_run():
+        mlflow.end_run()
 
-    # 2. Set Experiment
-    experiment_name = "Diabetes_Prediction"
-    try:
-        experiment_id = mlflow.create_experiment(experiment_name, artifact_location=mlflow_dir)
-    except:
-        experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
-
-    # 3. Load Data
+    # 1. Load Data Hasil Preprocessing
     df = pd.read_csv('diabetes_processed.csv')
 
+    # Pisahkan data train/test
+    train_df = df[df['Data_Type'] == 'train']
+    test_df = df[df['Data_Type'] == 'test']
+
+    X_train = train_df.drop(['Outcome', 'Data_Type'], axis=1)
+    y_train = train_df['Outcome']
+    X_test = test_df.drop(['Outcome', 'Data_Type'], axis=1)
+    y_test = test_df['Outcome']
+
+    # 2. Setup MLflow
+    mlflow_dir = Path("mlruns").absolute()
+    mlflow.set_tracking_uri(mlflow_dir.as_uri())
+    mlflow.set_experiment("GitHub_Actions_Diabetes")
+
     # 3. Train model dengan default parameters
-    with mlflow.start_run(experiment_id=experiment_id):
-        
-        # Pisahkan data train/test
-        train_df = df[df['Data_Type'] == 'train']
-        test_df = df[df['Data_Type'] == 'test']
-
-        X_train = train_df.drop(['Outcome', 'Data_Type'], axis=1)
-        y_train = train_df['Outcome']
-        X_test = test_df.drop(['Outcome', 'Data_Type'], axis=1)
-        y_test = test_df['Outcome']
-
-        mlflow.log_param("model_type", "RandomForest")
-
+    with mlflow.start_run(run_name="RF_Default_Params"):
         # Initialize and train model
         rf = RandomForestClassifier(random_state=42, class_weight='balanced')
         rf.fit(X_train, y_train)

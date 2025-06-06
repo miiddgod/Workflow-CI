@@ -21,7 +21,9 @@ jobs:
           
       - name: Run Training
         run: |
-          cd MLProject && python modelling.py
+          cd MLProject && \
+          python -c "from mlflow.models.signature import infer_signature; print('infer_signature imported successfully')" && \
+          python modelling.py
           
       - name: Upload Results
         uses: actions/upload-artifact@v4
