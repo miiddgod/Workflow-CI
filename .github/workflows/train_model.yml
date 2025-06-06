@@ -5,10 +5,10 @@ jobs:
   train:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.8'
           
@@ -17,14 +17,16 @@ jobs:
           pip install mlflow scikit-learn pandas numpy
           
       - name: Create MLflow directory
-        run: mkdir -p mlruns
+        run: mkdir -p MLProject/mlruns
           
       - name: Run Training
         run: |
           cd MLProject && python modelling.py
           
       - name: Upload Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: mlflow_results
           path: MLProject/mlruns
+          if-no-files-found: error
+          retention-days: 1
