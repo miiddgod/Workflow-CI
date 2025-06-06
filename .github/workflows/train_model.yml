@@ -1,0 +1,30 @@
+name: Train Model
+on: [push]
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          
+      - name: Install dependencies
+        run: |
+          pip install mlflow scikit-learn pandas numpy
+          
+      - name: Create MLflow directory
+        run: mkdir -p mlruns
+          
+      - name: Run Training
+        run: |
+          cd MLProject && python modelling.py
+          
+      - name: Upload Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: mlflow_results
+          path: MLProject/mlruns
