@@ -26,12 +26,25 @@ def main():
     mlflow.set_experiment("Diabetes_Prediction")
     
     # Autologging    
-    mlflow.sklearn.autolog(
-        log_input_examples=True,
-        log_model_signatures=True,
-        registered_model_name="Diabetes_Model",
-        disable_for_unsupported_versions=True
-    )
+    try:
+        import sklearn
+        sklearn_version = sklearn.__version__
+        if sklearn_version.startswith('1.'):
+            raise ImportError("Versi sklearn tidak kompatibel")
+            
+        mlflow.sklearn.autolog(
+            log_input_examples=True,
+            log_model_signatures=True,
+            silent=True
+        )
+    except Exception as e:
+        print(f"Autolog disabled: {str(e)}")
+        # Fallback ke manual logging
+        mlflow.log_params(model.get_params())
+        mlflow.log_metrics({
+            "accuracy": accuracy_score(y_test, y_pred),
+            "roc_auc": roc_auc_score(y_test, y_proba)
+        })
 
     # 3. Train model dengan default parameters
     with mlflow.start_run(run_name="RF_Default_Params"):
