@@ -7,23 +7,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'
           
-      - name: Install dependencies
+      - name: Install MLflow
+        run: pip install mlflow==2.3.1
+      
+      - name: Run MLflow Project
         run: |
-          pip install mlflow scikit-learn pandas numpy
-          
-      - name: Create MLflow directory
-        run: mkdir -p MLProject/mlruns
-          
-      - name: Run Training
-        run: |
-          cd MLProject && \
-          python -c "from mlflow.models.signature import infer_signature; print('infer_signature imported successfully')" && \
-          python modelling.py
+          mlflow run ./MLProject --env-manager=local
           
       - name: Upload Results
         uses: actions/upload-artifact@v4
