@@ -17,7 +17,7 @@ jobs:
       
       - name: Run MLflow Project
         run: |
-          mlflow run ./MLProject --env-manager=local
+          mlflow run ./MLProject --env-manager=local --experiment-name="CI_Pipeline"
           
       - name: Upload Results
         uses: actions/upload-artifact@v4

@@ -25,11 +25,12 @@ def main():
     mlflow.set_tracking_uri(mlflow_dir.as_uri())
     mlflow.set_experiment("Diabetes_Prediction")
     
-    # Aktifkan autologging
+    # Autologging    
     mlflow.sklearn.autolog(
         log_input_examples=True,
         log_model_signatures=True,
-        log_models=True
+        registered_model_name="Diabetes_Model",
+        disable_for_unsupported_versions=True
     )
 
     # 3. Train model dengan default parameters
