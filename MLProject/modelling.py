@@ -23,8 +23,10 @@ def main():
     # 2. Setup MLflow
     mlflow_dir = Path("mlruns").absolute()
     mlflow.set_tracking_uri(mlflow_dir.as_uri())
+
+    # Pastikan eksperimen sudah ada
     mlflow.set_experiment("Diabetes_Prediction")
-    
+
     # Aktifkan autologging
     mlflow.sklearn.autolog(
         log_input_examples=True,
