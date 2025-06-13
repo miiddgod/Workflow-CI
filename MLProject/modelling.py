@@ -25,26 +25,12 @@ def main():
     mlflow.set_tracking_uri(mlflow_dir.as_uri())
     mlflow.set_experiment("Diabetes_Prediction")
     
-    # Autologging    
-    try:
-        import sklearn
-        sklearn_version = sklearn.__version__
-        if sklearn_version.startswith('1.'):
-            raise ImportError("Versi sklearn tidak kompatibel")
-            
-        mlflow.sklearn.autolog(
-            log_input_examples=True,
-            log_model_signatures=True,
-            silent=True
-        )
-    except Exception as e:
-        print(f"Autolog disabled: {str(e)}")
-        # Fallback ke manual logging
-        mlflow.log_params(model.get_params())
-        mlflow.log_metrics({
-            "accuracy": accuracy_score(y_test, y_pred),
-            "roc_auc": roc_auc_score(y_test, y_proba)
-        })
+    # Aktifkan autologging
+    mlflow.sklearn.autolog(
+        log_input_examples=True,
+        log_model_signatures=True,
+        log_models=True
+    )
 
     # 3. Train model dengan default parameters
     with mlflow.start_run(run_name="RF_Default_Params"):
