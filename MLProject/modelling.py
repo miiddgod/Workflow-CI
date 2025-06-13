@@ -8,7 +8,7 @@ def main():
     if mlflow.active_run():
         mlflow.end_run()
 
-    # 1. Load Data Hasil Preprocessing
+    # Load Data Hasil Preprocessing
     df = pd.read_csv('diabetes_processed.csv')
 
     # Pisahkan data train/test
@@ -20,33 +20,23 @@ def main():
     X_test = test_df.drop(['Outcome', 'Data_Type'], axis=1)
     y_test = test_df['Outcome']
 
-    # 2. Setup MLflow
+    # Setup MLflow
     mlflow_dir = Path("mlruns").absolute()
     mlflow.set_tracking_uri(mlflow_dir.as_uri())
-
-    # Pastikan eksperimen sudah ada
     mlflow.set_experiment("Diabetes_Prediction")
 
-    # Aktifkan autologging
-    mlflow.sklearn.autolog(
-        log_input_examples=True,
-        log_model_signatures=True,
-        log_models=True
-    )
+    # Autolog
+    mlflow.sklearn.autolog()
 
-    # 3. Train model dengan default parameters
-    with mlflow.start_run(run_name="RF_Default_Params"):
-        # Initialize and train model
-        rf = RandomForestClassifier(random_state=42, class_weight='balanced')
-        
-        # Autolog
-        rf.fit(X_train, y_train)
-        
-        # Generate predictions
-        y_pred = rf.predict(X_test)
-        
-        # Print hasil (opsional)
-        print("\n=== Model Training Complete ===")
+    # Train model
+    try:
+        with mlflow.start_run(run_name="RF_Default_Params"):
+            rf = RandomForestClassifier(random_state=42, class_weight='balanced')
+            rf.fit(X_train, y_train)
+            y_pred = rf.predict(X_test)
+            print("\n=== Model Training Complete ===")
+    except Exception as e:
+        print(f"Error starting MLflow run: {e}")
 
 if __name__ == "__main__":
     main()
